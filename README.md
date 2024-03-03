@@ -1,13 +1,13 @@
 # book-manager
 ### This is a simple book manager to create new entries to store book title and author
 
->To start the project, run:
+>### To start the project, run:
 `Python .\app.py`
 
 
->**Requirements**
+>### Requirements
 > 
-> In your virtual environment, run:
+>### In your virtual environment, run:
 > 
 > `pip install flask`
 > 
