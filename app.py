@@ -1,5 +1,8 @@
+import io
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+import csv
+from flask import Response
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///books.db"
@@ -41,6 +44,69 @@ def delete(id):
         db.session.delete(book_to_delete)
         db.session.commit()
     return redirect(url_for('index'))
+
+
+@app.route('/import', methods=['POST'])
+def import_books():
+    if 'file' not in request.files:
+        # No file part in the request
+        return redirect(url_for('index'))
+
+    file = request.files['file']
+
+    if file.filename == '':
+        # No selected file
+        return redirect(url_for('index'))
+
+    if file:
+        # Read and import data from the uploaded CSV file
+        data = csv.reader(file.stream.read().decode('utf-8').splitlines())
+        next(data)  # Skip header row if it exists
+
+        with app.app_context():
+            for row in data:
+                title, author = row
+                new_book = Book(title=title, author=author)
+                db.session.add(new_book)
+
+            db.session.commit()
+
+        return redirect(url_for('index'))
+
+
+@app.route('/export', methods=['GET'])
+def export_books():
+    books = Book.query.all()
+
+    # Prepare data for CSV export
+    data = [
+               ['Title', 'Author']
+           ] + [
+               [book.title, book.author]
+               for book in books
+           ]
+    # Set up the response
+    csv_filename = 'books_export.csv'
+    response = Response(
+        generate_csv(data),
+        content_type='text/csv',
+        headers={'Content-Disposition': f'attachment; filename={csv_filename}'}
+    )
+
+    return response
+
+
+def generate_csv(data):
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    # Write header
+    writer.writerow(['Title', 'Author'])
+
+    # Write data
+    writer.writerows(data)
+
+    return output.getvalue()
 
 
 if __name__ == "__main__":
