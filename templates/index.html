@@ -30,6 +30,10 @@
             <label for="author">Author:</label>
             <input type="text" class="form-control" id="author" name="author" required>
         </div>
+        <div class="form-group">
+            <label for="genre">Genre:</label>
+            <input type="text" class="form-control" id="genre" name="genre" required>
+        </div>
         <button type="submit" class="btn btn-primary">Add Book</button>
     </form>
 
@@ -37,7 +41,7 @@
     <ul class="list-group mt-4">
         {% for book in all_books %}
             <li class="list-group-item">
-                {{ book.title }} by {{ book.author }}
+                {{ book.title }} by {{ book.author }}, Genre: {{ book.genre }}
                 <a href="{{ url_for('delete', id=book.id) }}" class="btn btn-danger btn-sm float-right">Delete</a>
             </li>
         {% endfor %}

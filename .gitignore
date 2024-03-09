@@ -1,2 +1,3 @@
 # .gitignore
 /instance/
+/migrations/
